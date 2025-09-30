@@ -56,13 +56,12 @@ class MainActivityViewModel @Inject constructor(
     }
 
     private fun fetchWeatherData() {
-//        if (networkUtil.isNetworkAvailable()) {
-//            fetchWeatherReport(cityName.value)
-//        } else {
-//            fetchFromDB()
-//        }
+        if (networkUtil.isNetworkAvailable()) {
+            fetchWeatherReport(cityName.value)
+        } else {
+            fetchFromDB()
+        }
 
-        fetchFromDB()
     }
 
     fun fetchWeatherReport(city: String = "New Delhi", units: String = "metric") {
