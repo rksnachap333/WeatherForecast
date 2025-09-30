@@ -1,12 +1,15 @@
 package me.rajesh.weatherforecast.view
 
+import android.R.attr.text
 import android.app.Activity
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -146,6 +149,7 @@ fun MainView(innerPadding: PaddingValues, mainActivityViewModel: MainActivityVie
     val cityName = mainActivityViewModel.cityName.collectAsState()
     val uiState by mainActivityViewModel.uiSTate.collectAsState()
     var isLoading by remember { mutableStateOf(false) }
+    var isNoData by remember { mutableStateOf(false) }
     var data by remember { mutableStateOf(emptyList<WeatherItem>()) }
     var errorData by remember { mutableStateOf("Something went wrong !!") }
     val focusManager = LocalFocusManager.current
@@ -160,16 +164,24 @@ fun MainView(innerPadding: PaddingValues, mainActivityViewModel: MainActivityVie
     when (uiState) {
         is UiState.Loading -> {
             isLoading = true
+            isNoData = false
         }
 
         is UiState.Success -> {
+            isNoData = false
             isLoading = false
             data = (uiState as UiState.Success<List<WeatherItem>>).data
         }
 
         is UiState.Error -> {
+            isNoData = false
             isLoading = false
             errorData = (uiState as UiState.Error).message
+        }
+
+        is UiState.NoData -> {
+            isLoading = false
+            isNoData = true
         }
     }
 
@@ -227,7 +239,37 @@ fun MainView(innerPadding: PaddingValues, mainActivityViewModel: MainActivityVie
             LoadingView()
         if (!isLoading && uiState is UiState.Success)
             ForecastReportView(data)
+        if(!isLoading && uiState is UiState.NoData) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.no_record),
+                    contentDescription = "No record",
+                    modifier = Modifier.size(80.dp)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "No Report Found.",
+                    style = TextStyle(
+                        fontSize = MaterialTheme.typography.headlineSmall.fontSize,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                )
+                Text(
+                    text = "Check internet connectivity and search again.",
+                    style = TextStyle(
+                        fontSize = MaterialTheme.typography.bodySmall.fontSize,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                )
+            }
 
+        }
         if (!isLoading && uiState is UiState.Error)
             ErrorView(errorData) {
                 mainActivityViewModel.triggerFetchCityData(cityName.value)

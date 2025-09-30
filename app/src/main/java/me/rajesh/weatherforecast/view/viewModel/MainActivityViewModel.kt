@@ -56,11 +56,13 @@ class MainActivityViewModel @Inject constructor(
     }
 
     private fun fetchWeatherData() {
-        if (networkUtil.isNetworkAvailable()) {
-            fetchWeatherReport(cityName.value)
-        } else {
-            fetchFromDB()
-        }
+//        if (networkUtil.isNetworkAvailable()) {
+//            fetchWeatherReport(cityName.value)
+//        } else {
+//            fetchFromDB()
+//        }
+
+        fetchFromDB()
     }
 
     fun fetchWeatherReport(city: String = "New Delhi", units: String = "metric") {
@@ -100,9 +102,15 @@ class MainActivityViewModel @Inject constructor(
                     _uiState.value = UiState.Error(it.toString())
                 }
                 .collect {
+                    if(it != null) {
+                        it?.let{
+                            _uiState.value =
+                                UiState.Success(getThreeDayForecast(it.toWeatherForecastResponse().list))
+                        }
+                    } else{
+                        _uiState.value = UiState.NoData
+                    }
 
-                    _uiState.value =
-                        UiState.Success(getThreeDayForecast(it.toWeatherForecastResponse().list))
                 }
 
         }
