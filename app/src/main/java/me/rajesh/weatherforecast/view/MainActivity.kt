@@ -239,7 +239,7 @@ fun MainView(innerPadding: PaddingValues, mainActivityViewModel: MainActivityVie
             LoadingView()
         if (!isLoading && uiState is UiState.Success)
             ForecastReportView(data)
-        if(!isLoading && uiState is UiState.NoData) {
+        if(!isLoading && isNoData && uiState is UiState.NoData) {
             Column(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,

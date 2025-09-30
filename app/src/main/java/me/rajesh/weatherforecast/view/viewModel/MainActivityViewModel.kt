@@ -61,6 +61,8 @@ class MainActivityViewModel @Inject constructor(
         } else {
             fetchFromDB()
         }
+//        fetchFromDB()
+
 
     }
 
@@ -77,14 +79,19 @@ class MainActivityViewModel @Inject constructor(
                     _uiState.value = UiState.Error(it.toString())
                 }
                 .collect {
-                    try {
-                        weatherForecastLocalRepo.insertWeatherForecast(it.toWeatherForecastEntry())
-                    } catch (e: Exception) {
-                        println(TAG + " Exception: ${e.toString()}")
+                    if(it != null) {
+                        try {
+                            weatherForecastLocalRepo.insertWeatherForecast(it.toWeatherForecastEntry())
+                        } catch (e: Exception) {
+                            println(TAG + " Exception: ${e.toString()}")
+                        }
+                        preferenceManager.saveLastCity(it.city.name)
+                        _cityName.value = it.city.name
+                        _uiState.value = UiState.Success(getThreeDayForecast(it.list))
+                    } else{
+                        _uiState.value = UiState.NoData
                     }
-                    preferenceManager.saveLastCity(it.city.name)
-                    _cityName.value = it.city.name
-                    _uiState.value = UiState.Success(getThreeDayForecast(it.list))
+
                 }
         }
     }
@@ -102,10 +109,8 @@ class MainActivityViewModel @Inject constructor(
                 }
                 .collect {
                     if(it != null) {
-                        it?.let{
-                            _uiState.value =
-                                UiState.Success(getThreeDayForecast(it.toWeatherForecastResponse().list))
-                        }
+                        _uiState.value =
+                            UiState.Success(getThreeDayForecast(it.toWeatherForecastResponse().list))
                     } else{
                         _uiState.value = UiState.NoData
                     }
