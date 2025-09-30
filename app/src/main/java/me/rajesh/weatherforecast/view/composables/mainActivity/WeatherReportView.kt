@@ -43,7 +43,7 @@ fun ForecastReportView(data: List<WeatherItem>) {
                 WeatherCard(
                     temperature = data[0].main.temp,
                     condition = data[0].weather[0].description,
-                    day = "Today",
+                    day = "Today (" + data[0].dt_txt.split(" ")[0] + ")",
                     iconCode = data[0].weather[0].icon
 
                 )
@@ -55,7 +55,7 @@ fun ForecastReportView(data: List<WeatherItem>) {
                 WeatherCard(
                     temperature = data[1].main.temp,
                     condition = data[1].weather[0].description,
-                    day = "Tomorrow",
+                    day = "Tomorrow (" + data[1].dt_txt.split(" ")[0] + ")",
                     iconCode = data[1].weather[0].icon
                 )
             }
